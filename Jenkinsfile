@@ -62,7 +62,16 @@ pipeline {
 
                         echo "Stopping Tomcat..."
                         #ssh ${PROD_USER}@${PROD_HOST} '${TOMCAT_BIN}/shutdown.sh'
-                        ssh ${PROD_USER}@${PROD_HOST} "${TOMCAT_BIN}/shutdown.sh"
+                        #ssh ${PROD_USER}@${PROD_HOST} "${TOMCAT_BIN}/shutdown.sh"
+                        ssh ${PROD_USER}@${PROD_HOST} "TOMCAT_BIN=${TOMCAT_BIN}; \
+                        if pgrep -f 'tomcat' > /dev/null; then \
+                        echo 'Tomcat is running. Stopping...'; \
+                        \$TOMCAT_BIN/shutdown.sh; \
+                        echo 'Tomcat stopped.'; \
+                        else \
+                        echo 'Tomcat is not running. Skipping shutdown.'; \
+                        fi"
+
 
                         echo "Backing up current WAR..."
                         ssh -o StrictHostKeyChecking=no ${PROD_USER}@${PROD_HOST} '
