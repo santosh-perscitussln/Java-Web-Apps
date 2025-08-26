@@ -79,7 +79,7 @@ pipeline {
                         ssh ${PROD_USER}@${PROD_HOST} "mv ${TOMCAT_WEBAPPS}/${APP_NAME}-${VERSION}.war ${TOMCAT_WEBAPPS}/${APP_NAME}.war"
 
                         echo "Starting Tomcat..."
-                        ssh ${PROD_USER}@${PROD_HOST} '${TOMCAT_BIN}/startup.sh'
+                        ssh ${PROD_USER}@${PROD_HOST} '${TOMCAT_BIN}/startup.sh"
                     '''
                 }
             }
