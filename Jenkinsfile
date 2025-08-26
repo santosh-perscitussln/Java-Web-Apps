@@ -23,15 +23,21 @@ pipeline {
             }
         }
 
-        stage('Get Version from Git Tag') {
-            steps {
-                script {
-                    VERSION = sh(script: "git describe --tags --abbrev=0", returnStdout: true).trim()
-                    echo "Deploying version: ${VERSION}"
-                    env.VERSION = VERSION
-                }
+    stage('Get Version from Git Tag') {
+    steps {
+        script {
+            try {
+                VERSION = sh(script: "git describe --tags --abbrev=0", returnStdout: true).trim()
+                echo "Deploying version from tag: ${VERSION}"
+            } catch (Exception e) {
+                echo "⚠️ No Git tags found. Using default version 0.0.1"
+                VERSION = "0.0.1"
             }
+            env.VERSION = VERSION
         }
+    }
+}
+
 
         stage('Build WAR') {
             steps {
