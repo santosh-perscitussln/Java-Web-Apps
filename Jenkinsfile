@@ -40,19 +40,19 @@ pipeline {
 
         stage('Build WAR') {
             steps {
-                sh """
+                sh '''
                     mvn clean package -DskipTests
                     WAR_FILE=target/${APP_NAME}-${VERSION}.war
                     cp target/*.war \${WAR_FILE}
                     echo "WAR file created: \${WAR_FILE}"
-                """
+                '''
             }
         }
 
         stage('Deploy to EC2') {
             steps {
                 sshagent(credentials: [env.PROD_CRED_ID]) {
-                    sh """
+                    sh '''
                         set -e
                         WAR_FILE=target/${APP_NAME}-${VERSION}.war
 
@@ -80,7 +80,7 @@ pipeline {
 
                         echo "Starting Tomcat..."
                         ssh ${PROD_USER}@${PROD_HOST} '${TOMCAT_BIN}/startup.sh'
-                    """
+                    '''
                 }
             }
         }
