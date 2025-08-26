@@ -76,8 +76,7 @@ pipeline {
                         echo "Backing up current WAR..."
                         ssh -o StrictHostKeyChecking=no ${PROD_USER}@${PROD_HOST} '
                         if [ -f ${TOMCAT_WEBAPPS}/${APP_NAME}.war ]; then
-                            mv ${TOMCAT_WEBAPPS}/${APP_NAME}.war \
-                               ${TOMCAT_WEBAPPS}/${APP_NAME}_backup_$(date +%Y%m%d%H%M%S).war
+                            mv ${TOMCAT_WEBAPPS}/${APP_NAME}.war ${TOMCAT_WEBAPPS}/${APP_NAME}_backup_$(date +%Y%m%d%H%M%S).war
                         fi
                         '
 
@@ -85,7 +84,7 @@ pipeline {
                         scp "\${WAR_FILE}" ${PROD_USER}@${PROD_HOST}:${TOMCAT_WEBAPPS}/
 
                         echo "Renaming WAR to standard name..."
-                        ssh ${PROD_USER}@${PROD_HOST} "mv ${TOMCAT_WEBAPPS}/${APP_NAME}-${VERSION}.war ${TOMCAT_WEBAPPS}/${APP_NAME}.war"
+                        #ssh ${PROD_USER}@${PROD_HOST} "mv ${TOMCAT_WEBAPPS}/${APP_NAME}-${VERSION}.war ${TOMCAT_WEBAPPS}/${APP_NAME}.war"
 
                         echo "Starting Tomcat..."
                         ssh ${PROD_USER}@${PROD_HOST} "${TOMCAT_BIN}/startup.sh"
