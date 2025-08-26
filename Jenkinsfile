@@ -12,6 +12,7 @@ pipeline {
         TOMCAT_BIN     = '/prod/tomcat/apache-tomcat-9.0.99/bin'
         APP_NAME       = 'Java-Web-Apps'
         APP_PORT       = '8085'
+        BACKUP_PATH    = '/prod/backup'
     }
 
     stages {
@@ -74,6 +75,7 @@ pipeline {
 
 
                         echo "Backing up current WAR..."
+                        ssh ${PROD_USER}@${PROD_HOST} mkdir -p ${BACKUP_PATH}_$(date +%Y%m%d%H)
                         ssh -o StrictHostKeyChecking=no ${PROD_USER}@${PROD_HOST} '
                         if [ -f ${TOMCAT_WEBAPPS}/${APP_NAME}.war ]; then
                             mv ${TOMCAT_WEBAPPS}/${APP_NAME}.war ${TOMCAT_WEBAPPS}/${APP_NAME}_backup_$(date +%Y%m%d%H%M%S).war
