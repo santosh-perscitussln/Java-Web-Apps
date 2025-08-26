@@ -3,7 +3,7 @@ pipeline {
 
   environment {
     GIT_REPO       = 'https://github.com/santosh-perscitussln/Java-Web-Apps.git'
-    BRANCH         = 'master'
+    BRANCH         = 'main'
     GIT_CRED_ID    = 'github-pat'   // Add PAT credentials in Jenkins
     PROD_HOST      = '3.85.162.30'
     PROD_USER      = 'prod-deploy'
