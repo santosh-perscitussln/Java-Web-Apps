@@ -75,10 +75,10 @@ pipeline {
 
 
                         echo "Backing up current WAR..."
-                        ssh ${PROD_USER}@${PROD_HOST} "mkdir -p ${BACKUP_PATH}/$(date +%Y%m%d%H)"
+                        ssh ${PROD_USER}@${PROD_HOST} "mkdir -p ${BACKUP_PATH}/$(date +%Y%m%d)"
                         ssh -o StrictHostKeyChecking=no ${PROD_USER}@${PROD_HOST} '
                         if [ -f ${TOMCAT_WEBAPPS}/${APP_NAME}.war ]; then
-                            mv ${TOMCAT_WEBAPPS}/${APP_NAME}.war ${TOMCAT_WEBAPPS}/${APP_NAME}_backup_$(date +%Y%m%d%H%M%S).war
+                            mv ${TOMCAT_WEBAPPS}/${APP_NAME}.war ${BACKUP_PATH}/$(date +%Y%m%d)/${APP_NAME}_backup_$(date +%Y%m%d%H%M%S).war
                         fi
                         '
 
