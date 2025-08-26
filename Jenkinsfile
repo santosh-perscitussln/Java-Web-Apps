@@ -61,7 +61,8 @@ pipeline {
                         ssh-keyscan -H "${PROD_HOST}" >> ~/.ssh/known_hosts
 
                         echo "Stopping Tomcat..."
-                        ssh ${PROD_USER}@${PROD_HOST} '${TOMCAT_BIN}/shutdown.sh'
+                        #ssh ${PROD_USER}@${PROD_HOST} '${TOMCAT_BIN}/shutdown.sh'
+                        ssh ${PROD_USER}@${PROD_HOST} "${TOMCAT_BIN}/shutdown.sh"
 
                         echo "Backing up current WAR..."
                         ssh -o StrictHostKeyChecking=no ${PROD_USER}@${PROD_HOST} '
