@@ -89,6 +89,7 @@ pipeline {
 
                         echo "Starting Tomcat..."
                         ssh ${PROD_USER}@${PROD_HOST} "${TOMCAT_BIN}/startup.sh"
+                        sleep 10
                     '''
                 }
             }
