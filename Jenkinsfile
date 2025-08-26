@@ -74,7 +74,7 @@ pipeline {
                         fi"
 
 
-                        ssh ${PROD_USER}@${PROD_HOST} '''
+                        ssh ${PROD_USER}@${PROD_HOST}
                         BACKUP_DIR=${BACKUP_PATH}/\$(date +%Y%m%d)
                         mkdir -p $BACKUP_DIR
                         
@@ -85,7 +85,6 @@ pipeline {
                         else
                             echo "No WAR file to backup. Skipping..."
                         fi
-                        '''
 
                         echo "Copying new WAR..."
                         scp "\${WAR_FILE}" ${PROD_USER}@${PROD_HOST}:${TOMCAT_WEBAPPS}/
