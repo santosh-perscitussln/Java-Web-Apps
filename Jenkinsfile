@@ -59,7 +59,7 @@ pipeline {
                 ssh ${PROD_USER}@${PROD_HOST} "${TOMCAT_BIN}/shutdown.sh"
 
                 echo "Backing up current WAR..."
-                ssh ${PROD_USER}@${PROD_HOST} 'if [ -f ${TOMCAT_WEBAPPS}/${APP_NAME}.war ]; then mv ${TOMCAT_WEBAPPS}/${APP_NAME}.war ${TOMCAT_WEBAPPS}/${APP_NAME}_backup_\\$(date +%Y%m%d%H%M%S).war; fi'
+                sh "ssh ${PROD_USER}@${PROD_HOST} 'if [ -f ${TOMCAT_WEBAPPS}/${APP_NAME}.war ]; then mv ${TOMCAT_WEBAPPS}/${APP_NAME}.war ${TOMCAT_WEBAPPS}/${APP_NAME}_backup_\$(date +%Y%m%d%H%M%S).war; fi'"
 
                 echo "Copying new WAR..."
                 scp "\${WAR_FILE}" ${PROD_USER}@${PROD_HOST}:${TOMCAT_WEBAPPS}/
