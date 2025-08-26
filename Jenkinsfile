@@ -65,7 +65,12 @@ pipeline {
                 ssh ${PROD_USER}@${PROD_HOST} "${TOMCAT_BIN}/shutdown.sh"
 
                 echo "Backing up current WAR..."
-                sh "ssh ${PROD_USER}@${PROD_HOST} 'if [ -f ${TOMCAT_WEBAPPS}/${APP_NAME}.war ]; then mv ${TOMCAT_WEBAPPS}/${APP_NAME}.war ${TOMCAT_WEBAPPS}/${APP_NAME}_backup_\$(date +%Y%m%d%H%M%S).war; fi'"
+                ssh -o StrictHostKeyChecking=no prod-deploy@3.85.162.30 '
+                if [ -f /prod/tomcat/apache-tomcat-9.0.99/webapps/Java-Web-Apps.war ]; then
+                mv /prod/tomcat/apache-tomcat-9.0.99/webapps/Java-Web-Apps.war \
+               /prod/tomcat/apache-tomcat-9.0.99/webapps/Java-Web-Apps_backup_$(date +%Y%m%d%H%M%S).war
+                fi
+                '
 
                 echo "Copying new WAR..."
                 scp "\${WAR_FILE}" ${PROD_USER}@${PROD_HOST}:${TOMCAT_WEBAPPS}/
