@@ -74,7 +74,7 @@ pipeline {
                         fi"
 
                         echo "Backing up existing WAR on remote..."
-                        ssh ${PROD_USER}@${PROD_HOST} '''
+                        ssh ${PROD_USER}@${PROD_HOST} << 'EOF'
                             BACKUP_DIR="/prod/backup"
                             TOMCAT_WEBAPPS="/prod/tomcat/apache-tomcat-9.0.99/webapps"
                             APP_NAME="Java-Web-Apps"
@@ -90,7 +90,8 @@ pipeline {
                             else
                                 echo "No WAR file to backup. Skipping..."
                             fi
-                        '''
+                        EOF
+
 
 
 
