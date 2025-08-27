@@ -74,18 +74,17 @@ pipeline {
                         fi"
 
 
-                        ssh ${PROD_USER}@${PROD_HOST}
-                        BACKUP_DIR=${BACKUP_PATH}
-                        #"mkdir -p /prod/backup/\$(date +%Y%m%d)"
-                        
-                        BACKUP_WAR_FILE=${TOMCAT_WEBAPPS}/${APP_NAME}-${VERSION}.war
-                        #WAR_FILE="target/Java-Web-Apps-0.0.1.war"
-                        if [ -f ${BACKUP_WAR_FILE} ]; then
-                            echo "Backing up \${WAR_FILE} to $BACKUP_DIR/${APP_NAME}_backup_$(date +%Y%m%d%H%M%S).war"
-                            mv ${BACKUP_WAR_FILE} ${BACKUP_DIR}/${APP_NAME}_backup_$(date +%Y%m%d%H%M%S).war
-                        else
-                            echo "No WAR file to backup. Skipping..."
-                        fi
+                            ssh ${PROD_USER}@${PROD_HOST} "
+                                BACKUP_DIR=${BACKUP_PATH};
+                                BACKUP_WAR_FILE=${TOMCAT_WEBAPPS}/${APP_NAME}-${VERSION}.war;
+                                mkdir -p \$BACKUP_DIR;
+                                if [ -f \$BACKUP_WAR_FILE ]; then
+                                    echo 'Backing up \$BACKUP_WAR_FILE to \$BACKUP_DIR/${APP_NAME}_backup_\$(date +%Y%m%d%H%M%S).war';
+                                    mv \$BACKUP_WAR_FILE \$BACKUP_DIR/${APP_NAME}_backup_\$(date +%Y%m%d%H%M%S).war;
+                                else
+                                    echo 'No WAR file to backup. Skipping...';
+                                fi
+                            "
 
                         echo "Copying new WAR..."
                         scp "\${WAR_FILE}" ${PROD_USER}@${PROD_HOST}:${TOMCAT_WEBAPPS}/
