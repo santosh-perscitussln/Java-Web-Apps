@@ -78,7 +78,7 @@ pipeline {
                         BACKUP_DIR=${BACKUP_PATH}
                         #"mkdir -p /prod/backup/\$(date +%Y%m%d)"
                         
-                        BACKUP_WAR_FILE=${TOMCAT_WEBAPPS}/${APP_NAME}.war
+                        BACKUP_WAR_FILE=${TOMCAT_WEBAPPS}/${WAR_FILE}.war
                         #WAR_FILE="target/Java-Web-Apps-0.0.1.war"
                         if [ -f $BACKUP_WAR_FILE ]; then
                             echo "Backing up \$WAR_FILE to $BACKUP_DIR/${APP_NAME}_backup_$(date +%Y%m%d%H%M%S).war"
