@@ -80,9 +80,9 @@ pipeline {
                         
                         BACKUP_WAR_FILE=${TOMCAT_WEBAPPS}/${WAR_FILE}.war
                         #WAR_FILE="target/Java-Web-Apps-0.0.1.war"
-                        if [ -f $BACKUP_WAR_FILE ]; then
-                            echo "Backing up \$WAR_FILE to $BACKUP_DIR/${APP_NAME}_backup_$(date +%Y%m%d%H%M%S).war"
-                            mv $BACKUP_WAR_FILE $BACKUP_DIR/${APP_NAME}_backup_$(date +%Y%m%d%H%M%S).war
+                        if [ -f ${WAR_FILE} ]; then
+                            echo "Backing up \${WAR_FILE} to $BACKUP_DIR/${APP_NAME}_backup_$(date +%Y%m%d%H%M%S).war"
+                            mv ${WAR_FILE} ${BACKUP_DIR}/${APP_NAME}_backup_$(date +%Y%m%d%H%M%S).war
                         else
                             echo "No WAR file to backup. Skipping..."
                         fi
