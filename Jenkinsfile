@@ -73,7 +73,7 @@ pipeline {
                         echo 'Tomcat is not running. Skipping shutdown.'; \
                         fi"
 
-
+                            echo "Backing up existing WAR on remote..."
                             ssh ${PROD_USER}@${PROD_HOST} "
                                 BACKUP_DIR=${BACKUP_PATH};
                                 BACKUP_WAR_FILE=${TOMCAT_WEBAPPS}/${APP_NAME}-${VERSION}.war;
@@ -85,6 +85,7 @@ pipeline {
                                     echo 'No WAR file to backup. Skipping...';
                                 fi
                             "
+
 
                         echo "Copying new WAR..."
                         scp "\${WAR_FILE}" ${PROD_USER}@${PROD_HOST}:${TOMCAT_WEBAPPS}/
