@@ -72,19 +72,26 @@ pipeline {
                         else \
                         echo 'Tomcat is not running. Skipping shutdown.'; \
                         fi"
+
+                        echo "Backing up existing WAR on remote..."
+                        ssh ${PROD_USER}@${PROD_HOST} "
+                            BACKUP_DIR=/prod/backup;
+                            TOMCAT_WEBAPPS=/prod/tomcat/apache-tomcat-9.0.99/webapps;
+                            APP_NAME=Java-Web-Apps;
+                            VERSION=0.0.1;
                         
-                            echo "Backing up existing WAR on remote..."
-                            ssh ${PROD_USER}@${PROD_HOST} "
-                                BACKUP_DIR=\${BACKUP_PATH};
-                                BACKUP_WAR_FILE=\${TOMCAT_WEBAPPS}/\${APP_NAME}-\${VERSION}.war;
-                                mkdir -p \${BACKUP_DIR};
-                                if [ -f \${BACKUP_WAR_FILE} ]; then
-                                    echo 'Backing up \${BACKUP_WAR_FILE} to \${BACKUP_DIR}/\${APP_NAME}_backup_\$(date +%Y%m%d%H%M%S).war';
-                                    mv \${BACKUP_WAR_FILE} \${BACKUP_DIR}/\${APP_NAME}_backup_\$(date +%Y%m%d%H%M%S).war;
-                                else
-                                    echo 'No WAR file to backup. Skipping...';
-                                fi
-                            "
+                            BACKUP_WAR_FILE=\${TOMCAT_WEBAPPS}/\${APP_NAME}-\${VERSION}.war;
+                        
+                            mkdir -p \${BACKUP_DIR};
+                        
+                            if [ -f \${BACKUP_WAR_FILE} ]; then
+                                echo 'Backing up \${BACKUP_WAR_FILE} to \${BACKUP_DIR}/\${APP_NAME}_backup_\$(date +%Y%m%d%H%M%S).war';
+                                mv \${BACKUP_WAR_FILE} \${BACKUP_DIR}/\${APP_NAME}_backup_\$(date +%Y%m%d%H%M%S).war;
+                            else
+                                echo 'No WAR file to backup. Skipping...';
+                            fi
+                        "
+
 
 
 
