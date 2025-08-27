@@ -10,7 +10,7 @@ pipeline {
         PROD_CRED_ID   = 'ec2-prod-deploy-ssh'
         TOMCAT_WEBAPPS = '/prod/tomcat/apache-tomcat-9.0.99/webapps'
         TOMCAT_BIN     = '/prod/tomcat/apache-tomcat-9.0.99/bin'
-        APP_NAME       = 'Java-Web-Apps-0.0.1'
+        APP_NAME       = 'Java-Web-Apps'
         APP_PORT       = '8085'
         BACKUP_PATH    = '/prod/backup'
     }
