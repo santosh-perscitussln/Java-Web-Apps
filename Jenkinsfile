@@ -74,10 +74,10 @@ pipeline {
                         fi"
 
 
-                        ssh ${PROD_USER}@${PROD_HOST}
+                        ssh ${PROD_USER}@${PROD_HOST} '''
                         BACKUP_DIR=${BACKUP_PATH}/$(date +%Y%m%d)
                         "mkdir -p /prod/backup/\$(date +%Y%m%d)"
-                        
+                        '''
                         WAR_FILE=${TOMCAT_WEBAPPS}/${APP_NAME}.war
                         if [ -f $WAR_FILE ]; then
                             echo "Backing up \$WAR_FILE to $BACKUP_DIR/${APP_NAME}_backup_$(date +%Y%m%d%H%M%S).war"
