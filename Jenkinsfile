@@ -75,31 +75,32 @@ pipeline {
                   fi"
                 
                   stage('Backup WAR on Remote') {
-                        steps {
-                            sshagent(credentials: [env.PROD_CRED_ID]) {
-                                sh """
-                                    ssh ${PROD_USER}@${PROD_HOST} \\
-                                    APP_NAME='Java-Web-Apps' \\
-                                    VERSION='0.0.1' \\
-                                    TOMCAT_WEBAPPS='/prod/tomcat/apache-tomcat-9.0.99/webapps' \\
-                                    BACKUP_DIR='/prod/backup' \\
-                                    'bash -s' <<'ENDSSH'
-                                        set -e
-                                        BACKUP_WAR_FILE="\$TOMCAT_WEBAPPS/\${APP_NAME}-\${VERSION}.war"
-                                        mkdir -p "\$BACKUP_DIR"
-                    
-                                        if [ -f "\$BACKUP_WAR_FILE" ]; then
-                                            TS=\$(date +%Y%m%d%H%M%S)
-                                            echo "Backing up \$BACKUP_WAR_FILE to \$BACKUP_DIR/\${APP_NAME}_backup_\${TS}.war"
-                                            mv "\$BACKUP_WAR_FILE" "\$BACKUP_DIR/\${APP_NAME}_backup_\${TS}.war"
-                                        else
-                                            echo "No WAR file to backup. Skipping..."
-                                        fi
-                                    ENDSSH
-                                """
-                            }
+                    steps {
+                        sshagent(credentials: [env.PROD_CRED_ID]) {
+                            sh '''
+                                ssh ${PROD_USER}@${PROD_HOST} "bash -s" << 'ENDSSH'
+                                set -e
+                                APP_NAME="Java-Web-Apps"
+                                VERSION="0.0.1"
+                                TOMCAT_WEBAPPS="/prod/tomcat/apache-tomcat-9.0.99/webapps"
+                                BACKUP_DIR="/prod/backup"
+                
+                                BACKUP_WAR_FILE="$TOMCAT_WEBAPPS/${APP_NAME}-${VERSION}.war"
+                                mkdir -p "$BACKUP_DIR"
+                
+                                if [ -f "$BACKUP_WAR_FILE" ]; then
+                                    TS=$(date +%Y%m%d%H%M%S)
+                                    echo "Backing up $BACKUP_WAR_FILE to $BACKUP_DIR/${APP_NAME}_backup_${TS}.war"
+                                    mv "$BACKUP_WAR_FILE" "$BACKUP_DIR/${APP_NAME}_backup_${TS}.war"
+                                else
+                                    echo "No WAR file to backup. Skipping..."
+                                fi
+                                ENDSSH
+                            '''
                         }
                     }
+                }
+
 
 
 
