@@ -50,57 +50,66 @@ pipeline {
             }
         }
 
-        stage('Deploy to EC2') {
-            steps {
-                sshagent(credentials: [env.PROD_CRED_ID]) {
-                sh '''
-                #!/bin/bash
-                set -e
-                WAR_FILE=target/${APP_NAME}-${VERSION}.war
-                TOMCAT_WEBAPPS=/prod/tomcat/apache-tomcat-9.0.99/webapps
-                BACKUP_DIR=/prod/backup
-                
-                mkdir -p ~/.ssh
-                chmod 700 ~/.ssh
-                ssh-keyscan -H "$PROD_HOST" >> ~/.ssh/known_hosts
-                
-                echo "Stopping Tomcat..."
-                ssh ${PROD_USER}@$PROD_HOST "TOMCAT_BIN=${TOMCAT_BIN}; \
-                  if pgrep -f 'tomcat' > /dev/null; then \
-                    echo 'Tomcat is running. Stopping...'; \
-                    \$TOMCAT_BIN/shutdown.sh; \
-                    echo 'Tomcat stopped.'; \
-                  else \
-                    echo 'Tomcat is not running. Skipping shutdown.'; \
-                  fi"
-                
-                 stage('Backup WAR on Remote') {
-                    steps {
-                        sshagent(credentials: [env.PROD_CRED_ID]) {
-                            sh '''
-                                ssh ${PROD_USER}@${PROD_HOST} "bash -s" << 'ENDSSH'
-                                set -e
-                                APP_NAME="Java-Web-Apps"
-                                VERSION="0.0.1"
-                                TOMCAT_WEBAPPS="/prod/tomcat/apache-tomcat-9.0.99/webapps"
-                                BACKUP_DIR="/prod/backup"
-                
-                                BACKUP_WAR_FILE="$TOMCAT_WEBAPPS/${APP_NAME}-${VERSION}.war"
-                                mkdir -p "$BACKUP_DIR"
-                
-                                if [ -f "$BACKUP_WAR_FILE" ]; then
-                                    TS=$(date +%Y%m%d%H%M%S)
-                                    echo "Backing up $BACKUP_WAR_FILE to $BACKUP_DIR/${APP_NAME}_backup_${TS}.war"
-                                    mv "$BACKUP_WAR_FILE" "$BACKUP_DIR/${APP_NAME}_backup_${TS}.war"
-                                else
-                                    echo "No WAR file to backup. Skipping..."
-                                fi
-                                ENDSSH
-                            '''
-                        }
-                    }
-                }
-
+       stage('Deploy to EC2') {
+          environment {
+            // make sure these are set (adjust to your paths/host)
+            APP_NAME       = 'Java-Web-Apps'
+            VERSION        = '0.0.1'                         // from your pipeline/tag if you want
+            PROD_USER      = 'prod-deploy'
+            PROD_HOST      = '3.85.162.30'
+            PROD_CRED_ID   = 'prod-deploy'
+            TOMCAT_BIN     = '/prod/tomcat/apache-tomcat-9.0.99/bin'
+            TOMCAT_WEBAPPS = '/prod/tomcat/apache-tomcat-9.0.99/webapps'
+            BACKUP_DIR     = '/prod/backup'
+          }
+          steps {
+            sshagent(credentials: [env.PROD_CRED_ID]) {
+              sh '''#!/bin/bash
+        set -euo pipefail
+        
+        WAR_FILE="target/${APP_NAME}-${VERSION}.war"
+        
+        # Ensure host key
+        mkdir -p ~/.ssh && chmod 700 ~/.ssh
+        ssh-keyscan -H "$PROD_HOST" >> ~/.ssh/known_hosts
+        
+        echo "Stopping Tomcat if running..."
+        ssh "${PROD_USER}@${PROD_HOST}" "TOMCAT_BIN='${TOMCAT_BIN}'; if pgrep -f tomcat >/dev/null 2>&1; then '\$TOMCAT_BIN/shutdown.sh' || true; fi"
+        
+        echo "Preparing backup dir on remote..."
+        ssh "${PROD_USER}@${PROD_HOST}" "mkdir -p '${BACKUP_DIR}'"
+        
+        echo "Copying new WAR to remote as staging file (.war.new)..."
+        scp "${WAR_FILE}" "${PROD_USER}@${PROD_HOST}":"${TOMCAT_WEBAPPS}/${APP_NAME}.war.new"
+        
+        echo "Backup old WAR and swap in new one..."
+        ssh "${PROD_USER}@${PROD_HOST}" "
+          set -euo pipefail
+          APP='${APP_NAME}'
+          WEBAPPS='${TOMCAT_WEBAPPS}'
+          BACKUPS='${BACKUP_DIR}'
+          NOW=\$(date +%Y%m%d%H%M%S)
+        
+          # backup only existing deployed WAR (APP.war), not the newly uploaded .war.new
+          if [ -f \"\$WEBAPPS/\$APP.war\" ]; then
+            echo \"Backing up \$WEBAPPS/\$APP.war to \$BACKUPS/\$APP-\$NOW.war\"
+            mv \"\$WEBAPPS/\$APP.war\" \"\$BACKUPS/\$APP-\$NOW.war\"
+          else
+            echo \"No existing \$APP.war to backup. Skipping...\"
+          fi
+        
+          # promote the new file
+          mv \"\$WEBAPPS/\$APP.war.new\" \"\$WEBAPPS/\$APP.war\"
+        "
+        
+        echo "Starting Tomcat..."
+        ssh "${PROD_USER}@${PROD_HOST}" "'${TOMCAT_BIN}/startup.sh'"
+        
+        echo "Done."
+        '''
+            }
+          }
+        }
 
 
 
