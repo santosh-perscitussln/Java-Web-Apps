@@ -74,7 +74,7 @@ pipeline {
                     echo 'Tomcat is not running. Skipping shutdown.'; \
                   fi"
                 
-                  stage('Backup WAR on Remote') {
+                 stage('Backup WAR on Remote') {
                     steps {
                         sshagent(credentials: [env.PROD_CRED_ID]) {
                             sh '''
@@ -100,6 +100,7 @@ pipeline {
                         }
                     }
                 }
+
 
 
 
