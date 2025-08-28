@@ -74,17 +74,23 @@ pipeline {
                     echo 'Tomcat is not running. Skipping shutdown.'; \
                   fi"
                 
-                echo "Backing up existing WAR on remote..."
-                ssh ${PROD_USER}@$PROD_HOST "bash -c 'set -e; \
-                  BACKUP_WAR_FILE=${TOMCAT_WEBAPPS}/${APP_NAME}-${VERSION}.war; \
-                  mkdir -p ${BACKUP_DIR}; \
-                  if [ -f \$BACKUP_WAR_FILE ]; then \
-                    TS=\$(date +%Y%m%d%H%M%S); \
-                    echo Backing up \$BACKUP_WAR_FILE to ${BACKUP_DIR}/${APP_NAME}_backup_\${TS}.war; \
-                    mv \$BACKUP_WAR_FILE ${BACKUP_DIR}/${APP_NAME}_backup_\${TS}.war; \
-                  else \
-                    echo No WAR file to backup. Skipping...; \
+                  ssh ${PROD_USER}@$PROD_HOST "bash -c 'set -e;
+                  BACKUP_DIR=/prod/backup;
+                  TOMCAT_WEBAPPS=/prod/tomcat/apache-tomcat-9.0.99/webapps;
+                  APP_NAME=\"Java-Web-Apps\";
+                  VERSION=\"0.0.1\";
+                  BACKUP_WAR_FILE=\$TOMCAT_WEBAPPS/\${APP_NAME}-\${VERSION}.war;
+                
+                  mkdir -p \$BACKUP_DIR;
+                
+                  if [ -f \"\$BACKUP_WAR_FILE\" ]; then
+                    TS=\$(date +%Y%m%d%H%M%S);
+                    echo Backing up \$BACKUP_WAR_FILE to \$BACKUP_DIR/\${APP_NAME}_backup_\${TS}.war;
+                    mv \"\$BACKUP_WAR_FILE\" \"\$BACKUP_DIR/\${APP_NAME}_backup_\${TS}.war\";
+                  else
+                    echo No WAR file to backup. Skipping...;
                   fi'"
+
                 
                 echo "Copying new WAR..."
                 scp "\${WAR_FILE}" ${PROD_USER}@${env.PROD_HOST}:"\${TOMCAT_WEBAPPS}/"
