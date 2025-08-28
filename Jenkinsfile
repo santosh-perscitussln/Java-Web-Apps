@@ -53,8 +53,8 @@ pipeline {
         stage('Deploy to EC2') {
             steps {
                 sshagent(credentials: [env.PROD_CRED_ID]) {
-                    sh '''
-                    #!/bin/bash
+                sh '''
+                #!/bin/bash
                 set -e
                 WAR_FILE=target/${APP_NAME}-${VERSION}.war
                 TOMCAT_WEBAPPS=/prod/tomcat/apache-tomcat-9.0.99/webapps
@@ -62,10 +62,10 @@ pipeline {
                 
                 mkdir -p ~/.ssh
                 chmod 700 ~/.ssh
-                ssh-keyscan -H "${env.PROD_HOST}" >> ~/.ssh/known_hosts
+                ssh-keyscan -H "$PROD_HOST" >> ~/.ssh/known_hosts
                 
                 echo "Stopping Tomcat..."
-                ssh ${PROD_USER}@${env.PROD_HOST} "TOMCAT_BIN=${TOMCAT_BIN}; \
+                ssh ${PROD_USER}@$PROD_HOST "TOMCAT_BIN=${TOMCAT_BIN}; \
                   if pgrep -f 'tomcat' > /dev/null; then \
                     echo 'Tomcat is running. Stopping...'; \
                     \$TOMCAT_BIN/shutdown.sh; \
@@ -75,7 +75,7 @@ pipeline {
                   fi"
                 
                 echo "Backing up existing WAR on remote..."
-                ssh ${PROD_USER}@${env.PROD_HOST} "bash -c 'set -e; \
+                ssh ${PROD_USER}@$PROD_HOST "bash -c 'set -e; \
                   BACKUP_WAR_FILE=${TOMCAT_WEBAPPS}/${APP_NAME}-${VERSION}.war; \
                   mkdir -p ${BACKUP_DIR}; \
                   if [ -f \$BACKUP_WAR_FILE ]; then \
@@ -90,10 +90,10 @@ pipeline {
                 scp "\${WAR_FILE}" ${PROD_USER}@${env.PROD_HOST}:"\${TOMCAT_WEBAPPS}/"
                 
                 echo "Renaming WAR to standard name..."
-                ssh ${PROD_USER}@${env.PROD_HOST} "mv ${TOMCAT_WEBAPPS}/${APP_NAME}-${VERSION}.war ${TOMCAT_WEBAPPS}/${APP_NAME}.war"
+                ssh ${PROD_USER}@$PROD_HOST "mv ${TOMCAT_WEBAPPS}/${APP_NAME}-${VERSION}.war ${TOMCAT_WEBAPPS}/${APP_NAME}.war"
                 
                 echo "Starting Tomcat..."
-                ssh ${PROD_USER}@${env.PROD_HOST} "${TOMCAT_BIN}/startup.sh"
+                ssh ${PROD_USER}@$$PROD_HOST "${TOMCAT_BIN}/startup.sh"
                 sleep 10
                 '''
                 }
