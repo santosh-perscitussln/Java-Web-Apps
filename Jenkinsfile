@@ -74,11 +74,11 @@ pipeline {
                     echo 'Tomcat is not running. Skipping shutdown.'; \
                   fi"
                 
-                  ssh ${PROD_USER}@$PROD_HOST "bash -c 'set -e;
+                  ssh ${PROD_USER}@${PROD_HOST} "bash -c 'set -e;
                   BACKUP_DIR=/prod/backup;
                   TOMCAT_WEBAPPS=/prod/tomcat/apache-tomcat-9.0.99/webapps;
-                  APP_NAME=\"Java-Web-Apps\";
-                  VERSION=\"0.0.1\";
+                  APP_NAME=Java-Web-Apps;
+                  VERSION=0.0.1;
                   BACKUP_WAR_FILE=\$TOMCAT_WEBAPPS/\${APP_NAME}-\${VERSION}.war;
                 
                   mkdir -p \$BACKUP_DIR;
@@ -90,6 +90,7 @@ pipeline {
                   else
                     echo No WAR file to backup. Skipping...;
                   fi'"
+
 
                 
                 echo "Copying new WAR..."
